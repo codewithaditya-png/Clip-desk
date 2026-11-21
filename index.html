@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f6f2fa">
+<title>Clip Desk</title>
+<style>
+:root {
+  font: 16px/1.5 system-ui, sans-serif;
+  color: #271c36;
+  background: #f6f2fa;
+  --muted: #645670;
+  --border: #ddd2e6;
+  --accent: #56339d;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { width: min(1140px, calc(100% - 32px)); margin: auto; padding: 34px 0 42px; }
+header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 22px 0 30px; border-bottom: 1px solid var(--border); }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(2.65rem, 8vw, 5rem); line-height: 1.05; letter-spacing: -.075em; }
+h2 { font-size: 1rem; }
+h3 { font-size: 1.07rem; overflow-wrap: anywhere; }
+header p { margin-top: 10px; color: var(--muted); }
+button, input, textarea, select { font: inherit; color: inherit; }
+button, input, textarea, select { border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px; background: white; }
+button { cursor: pointer; }
+button:hover { background: #ede5f7; }
+.primary { color: white; background: var(--accent); border-color: var(--accent); font-weight: 650; }
+.primary:hover { background: #43247f; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 22px 0; }
+.toolbar input { flex: 1; min-width: 0; max-width: 350px; }
+#summary, footer { color: var(--muted); font-size: .9rem; }
+.board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.lane { min-height: 245px; padding: 14px; border: 1px solid var(--border); border-radius: 16px; background: #eee8f3; }
+.lane-head { display: flex; align-items: center; justify-content: space-between; margin: 1px 2px 13px; }
+.lane h2 { display: flex; align-items: center; gap: 8px; }
+.lane h2::before { content: ''; width: 9px; height: 9px; background: #7840b6; border-radius: 50%; }
+.lane[data-stage="production"] h2::before { background: #9d5b0f; }
+.lane[data-stage="published"] h2::before { background: #227656; }
+.count { border-radius: 8px; background: white; padding: 2px 8px; color: var(--muted); font-size: .82rem; }
+.cards { display: grid; gap: 10px; }
+.card { border: 1px solid var(--border); border-radius: 12px; background: white; padding: 13px; min-width: 0; }
+.format { color: var(--accent); font-size: .76rem; font-weight: 700; margin-bottom: 5px; }
+.notes { color: var(--muted); font-size: .9rem; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 6px; }
+.card-actions { display: flex; justify-content: space-between; gap: 6px; margin-top: 12px; }
+.card-actions button, .card-actions select { font-size: .83rem; min-width: 0; padding: 7px; }
+.card-actions select { max-width: 70%; }
+.empty { color: var(--muted); padding: 24px 10px; font-size: .9rem; text-align: center; border: 1px dashed #c8bbd4; border-radius: 10px; }
+footer { margin-top: 20px; }
+dialog { width: min(470px, calc(100% - 28px)); max-height: 90dvh; border: 1px solid var(--border); border-radius: 16px; padding: 22px; color: inherit; }
+dialog::backdrop { background: #23153488; }
+dialog h2 { font-size: 1.3rem; }
+form { display: grid; gap: 13px; margin-top: 14px; }
+form label { display: grid; gap: 4px; min-width: 0; }
+.form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+form input, form select, form textarea { width: 100%; min-width: 0; }
+textarea { resize: vertical; }
+.dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.danger { color: #8a2445; margin-right: auto; }
+@media (max-width: 740px) {
+  main { padding-top: 16px; }
+  .board { grid-template-columns: 1fr; }
+  .lane { min-height: 0; }
+}
+@media (max-width: 430px) {
+  header { align-items: flex-start; flex-direction: column; }
+  .toolbar input { min-width: 100%; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Clip Desk</h1>
+      <p>Plan, produce, and publish your videos.</p>
+    </div>
+    <button class="primary" id="add" type="button">+ New idea</button>
+  </header>
+
+  <div class="toolbar">
+    <input id="search" type="search" aria-label="Search videos" placeholder="Search titles, formats, and notes">
+    <p id="summary" role="status"></p>
+  </div>
+
+  <div class="board" aria-label="Video production board">
+    <section class="lane" data-stage="ideas" aria-labelledby="ideas-heading">
+      <div class="lane-head"><h2 id="ideas-heading">Ideas</h2><span class="count"></span></div>
+      <div class="cards"></div>
+    </section>
+    <section class="lane" data-stage="production" aria-labelledby="production-heading">
+      <div class="lane-head"><h2 id="production-heading">In production</h2><span class="count"></span></div>
+      <div class="cards"></div>
+    </section>
+    <section class="lane" data-stage="published" aria-labelledby="published-heading">
+      <div class="lane-head"><h2 id="published-heading">Published</h2><span class="count"></span></div>
+      <div class="cards"></div>
+    </section>
+  </div>
+
+  <footer id="storage-status" role="status">Your board is saved in this browser.</footer>
+</main>
+
+<dialog id="editor" aria-labelledby="editor-title">
+  <h2 id="editor-title">New idea</h2>
+  <form id="video-form">
+    <label>Video title <input id="video-title" maxlength="100" required autofocus></label>
+    <div class="form-row">
+      <label>Format
+        <select id="video-format">
+          <option>YouTube Short</option><option>Long-form video</option><option>AI video</option><option>Other</option>
+        </select>
+      </label>
+      <label>Stage <select id="video-stage"></select></label>
+    </div>
+    <label>Hook or notes <textarea id="video-notes" rows="4" maxlength="600" placeholder="How will the video open?"></textarea></label>
+    <div class="dialog-actions">
+      <button class="danger" id="remove" type="button" hidden>Delete</button>
+      <button id="cancel" type="button">Cancel</button>
+      <button class="primary" type="submit">Save video</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const stages = {ideas: 'Ideas', production: 'In production', published: 'Published'};
+const storageKey = 'clip-desk.v1';
+const storageStatus = document.querySelector('#storage-status');
+const search = document.querySelector('#search');
+const summary = document.querySelector('#summary');
+const lanes = document.querySelectorAll('.lane');
+const add = document.querySelector('#add');
+const editor = document.querySelector('#editor');
+const form = document.querySelector('#video-form');
+const titleField = document.querySelector('#video-title');
+const formatField = document.querySelector('#video-format');
+const stageField = document.querySelector('#video-stage');
+const notesField = document.querySelector('#video-notes');
+const remove = document.querySelector('#remove');
+let editingId = null;
+let trigger = add;
+let cards = [];
+
+try {
+  const saved = JSON.parse(localStorage.getItem(storageKey) ?? '[]');
+  if (Array.isArray(saved)) {
+    cards = saved.filter(card => card && typeof card.id === 'string'
+      && typeof card.title === 'string' && typeof card.format === 'string'
+      && typeof card.notes === 'string' && Object.hasOwn(stages, card.stage));
+  }
+} catch {
+  storageStatus.textContent = 'Saved videos could not be loaded in this browser.';
+}
+
+function save() {
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(cards));
+    storageStatus.textContent = 'Your board is saved in this browser.';
+  } catch {
+    storageStatus.textContent = 'Saving is unavailable. Changes will last while this page stays open.';
+  }
+}
+
+function makeElement(tag, value, className) {
+  const element = document.createElement(tag);
+  element.textContent = value;
+  if (className) element.className = className;
+  return element;
+}
+
+function addStages(select, current) {
+  for (const [value, label] of Object.entries(stages)) {
+    select.add(new Option(label, value));
+  }
+  select.value = current;
+}
+
+function renderCard(card) {
+  const article = makeElement('article', '', 'card');
+  article.dataset.id = card.id;
+  article.append(makeElement('p', card.format, 'format'), makeElement('h3', card.title));
+  if (card.notes) article.append(makeElement('p', card.notes, 'notes'));
+
+  const actions = makeElement('div', '', 'card-actions');
+  const move = document.createElement('select');
+  move.setAttribute('aria-label', 'Stage for ' + card.title);
+  addStages(move, card.stage);
+  move.addEventListener('change', () => {
+    card.stage = move.value;
+    save();
+    render();
+    focusCard(card.id, 'select');
+  });
+
+  const edit = makeElement('button', 'Edit');
+  edit.type = 'button';
+  edit.setAttribute('aria-label', 'Edit ' + card.title);
+  edit.addEventListener('click', () => openEditor(card, edit));
+  actions.append(move, edit);
+  article.append(actions);
+  return article;
+}
+
+function render() {
+  const query = search.value.trim().toLowerCase();
+  const visible = cards.filter(card =>
+    [card.title, card.format, card.notes].some(value => value.toLowerCase().includes(query))
+  );
+  const published = cards.filter(card => card.stage === 'published').length;
+  summary.textContent = query
+    ? visible.length + ' of ' + cards.length + ' videos match'
+    : cards.length + (cards.length === 1 ? ' video' : ' videos') + ' · ' + published + ' published';
+
+  for (const lane of lanes) {
+    const stage = lane.dataset.stage;
+    const items = visible.filter(card => card.stage === stage);
+    lane.querySelector('.count').textContent = items.length;
+    const container = lane.querySelector('.cards');
+    const empty = query ? 'No matches here' : 'No videos here yet';
+    container.replaceChildren(...(items.length ? items.map(renderCard) : [makeElement('p', empty, 'empty')]));
+  }
+}
+
+function focusCard(id, control) {
+  const card = Array.from(document.querySelectorAll('.card')).find(element => element.dataset.id === id);
+  (card?.querySelector(control) ?? add).focus();
+}
+
+function openEditor(card, button) {
+  editingId = card?.id ?? null;
+  trigger = button;
+  document.querySelector('#editor-title').textContent = card ? 'Edit video' : 'New idea';
+  titleField.value = card?.title ?? '';
+  titleField.setCustomValidity('');
+  formatField.value = card?.format ?? 'YouTube Short';
+  stageField.value = card?.stage ?? 'ideas';
+  notesField.value = card?.notes ?? '';
+  remove.hidden = !card;
+  editor.showModal();
+  titleField.focus();
+}
+
+addStages(stageField, 'ideas');
+add.addEventListener('click', () => openEditor(null, add));
+search.addEventListener('input', render);
+titleField.addEventListener('input', () => titleField.setCustomValidity(''));
+document.querySelector('#cancel').addEventListener('click', () => editor.close());
+editor.addEventListener('close', () => {
+  if (trigger.isConnected) trigger.focus();
+});
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  const title = titleField.value.trim();
+  if (!title) {
+    titleField.setCustomValidity('Enter a video title.');
+    titleField.reportValidity();
+    return;
+  }
+  const values = {
+    title, format: formatField.value, stage: stageField.value, notes: notesField.value.trim()
+  };
+  const existing = cards.find(card => card.id === editingId);
+  if (existing) {
+    Object.assign(existing, values);
+  } else {
+    const id = crypto.randomUUID?.() ?? Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+    cards.push({id, ...values});
+    search.value = '';
+  }
+  save();
+  editor.close();
+  render();
+  if (existing) focusCard(existing.id, 'button');
+});
+
+remove.addEventListener('click', () => {
+  if (!window.confirm('Delete this video from your board?')) return;
+  cards = cards.filter(card => card.id !== editingId);
+  save();
+  editor.close();
+  render();
+  add.focus();
+});
+
+render();
+</script>
+</body>
+</html>
