@@ -3,103 +3,267 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f6f2fa">
+<meta name="theme-color" content="#111219">
 <title>Clip Desk</title>
 <style>
 :root {
+  color-scheme: dark;
   font: 16px/1.5 system-ui, sans-serif;
-  color: #271c36;
-  background: #f6f2fa;
-  --muted: #645670;
-  --border: #ddd2e6;
-  --accent: #56339d;
+  color: #f5f4fb;
+  background: #111219;
+  --surface: #1a1b24;
+  --border: #353646;
+  --muted: #b5b5c8;
+  --accent: #d4fc77;
+  --accent-ink: #212a0f;
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
-main { width: min(1140px, calc(100% - 32px)); margin: auto; padding: 34px 0 42px; }
-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 22px 0 30px; border-bottom: 1px solid var(--border); }
+main {
+  width: min(1240px, calc(100% - 48px));
+  margin: auto;
+  padding: 24px 0 38px;
+}
 h1, h2, h3, p { margin: 0; }
-h1 { font-size: clamp(2.65rem, 8vw, 5rem); line-height: 1.05; letter-spacing: -.075em; }
-h2 { font-size: 1rem; }
-h3 { font-size: 1.07rem; overflow-wrap: anywhere; }
-header p { margin-top: 10px; color: var(--muted); }
 button, input, textarea, select { font: inherit; color: inherit; }
-button, input, textarea, select { border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px; background: white; }
+button, input, textarea, select {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: #20212d;
+}
 button { cursor: pointer; }
-button:hover { background: #ede5f7; }
-.primary { color: white; background: var(--accent); border-color: var(--accent); font-weight: 650; }
-.primary:hover { background: #43247f; }
+button:hover { background: #2b2d3b; }
+button, select { min-height: 42px; }
+.primary {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 750;
+}
+.primary:hover { background: #e4ffa5; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 22px 0; }
-.toolbar input { flex: 1; min-width: 0; max-width: 350px; }
-#summary, footer { color: var(--muted); font-size: .9rem; }
+.topbar, .brand, .hero, .toolbar, .lane-head { display: flex; align-items: center; }
+.topbar { justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+.brand { gap: 10px; font-weight: 750; }
+.brand-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: .77rem;
+}
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  justify-content: space-between;
+  gap: 30px;
+  min-height: 218px;
+  padding: clamp(24px, 4.5vw, 54px);
+  border: 1px solid #48415b;
+  border-radius: 24px;
+  background: radial-gradient(ellipse at right top, #3f3157, transparent 70%), #222033;
+}
+.hero::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: '';
+  background-image: linear-gradient(#d5c4f00c 1px, transparent 1px), linear-gradient(90deg, #d5c4f00c 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(90deg, transparent 20%, #000);
+  pointer-events: none;
+}
+h1 {
+  max-width: 13ch;
+  font-size: clamp(2.35rem, 5.5vw, 4.4rem);
+  line-height: 1;
+  letter-spacing: -.065em;
+}
+.hero p { margin-top: 13px; color: #d5cde0; }
+.overview {
+  flex: 0 1 260px;
+  min-width: 210px;
+  padding: 17px;
+  border: 1px solid #716280;
+  border-radius: 14px;
+  background: #201b2c;
+}
+.overview label { display: block; font-size: .83rem; font-weight: 700; }
+progress { display: block; width: 100%; height: 10px; margin: 9px 0 4px; accent-color: var(--accent); }
+.overview p { margin-top: 6px; font-size: .82rem; }
+.toolbar {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 26px 0 16px;
+}
+.toolbar h2 { font-size: 1.24rem; letter-spacing: -.025em; }
+.toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: min(100%, 315px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0 12px;
+  background: var(--surface);
+  color: var(--muted);
+}
+.toolbar input { width: 100%; min-width: 0; border: 0; background: transparent; padding-left: 0; }
+.toolbar label:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.toolbar input:focus-visible { outline: none; }
+#summary, footer { color: var(--muted); font-size: .85rem; }
 .board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.lane { min-height: 245px; padding: 14px; border: 1px solid var(--border); border-radius: 16px; background: #eee8f3; }
-.lane-head { display: flex; align-items: center; justify-content: space-between; margin: 1px 2px 13px; }
-.lane h2 { display: flex; align-items: center; gap: 8px; }
-.lane h2::before { content: ''; width: 9px; height: 9px; background: #7840b6; border-radius: 50%; }
-.lane[data-stage="production"] h2::before { background: #9d5b0f; }
-.lane[data-stage="published"] h2::before { background: #227656; }
-.count { border-radius: 8px; background: white; padding: 2px 8px; color: var(--muted); font-size: .82rem; }
+.lane {
+  --stage: #c6b2ff;
+  min-height: 264px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #171820;
+}
+.lane[data-stage="production"] { --stage: #ffd593; }
+.lane[data-stage="published"] { --stage: #9decbd; }
+.lane.is-drop-target { outline: 2px solid var(--stage); outline-offset: -2px; background: #222432; }
+.lane-head { min-height: 42px; gap: 9px; margin-bottom: 13px; }
+.lane h3 { display: flex; align-items: center; gap: 8px; font-size: .98rem; }
+.lane h3::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--stage);
+  border-radius: 50%;
+}
+.count {
+  border-radius: 8px;
+  background: #292b39;
+  color: var(--stage);
+  padding: 2px 8px;
+  font-size: .8rem;
+  font-variant-numeric: tabular-nums;
+}
+.lane-add { width: 42px; margin-left: auto; padding: 0; font-size: 1.18rem; }
 .cards { display: grid; gap: 10px; }
-.card { border: 1px solid var(--border); border-radius: 12px; background: white; padding: 13px; min-width: 0; }
-.format { color: var(--accent); font-size: .76rem; font-weight: 700; margin-bottom: 5px; }
-.notes { color: var(--muted); font-size: .9rem; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 6px; }
-.card-actions { display: flex; justify-content: space-between; gap: 6px; margin-top: 12px; }
-.card-actions button, .card-actions select { font-size: .83rem; min-width: 0; padding: 7px; }
-.card-actions select { max-width: 70%; }
-.empty { color: var(--muted); padding: 24px 10px; font-size: .9rem; text-align: center; border: 1px dashed #c8bbd4; border-radius: 10px; }
+.card {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--stage);
+  border-radius: 12px;
+  background: #222431;
+  padding: 13px;
+  overflow-wrap: anywhere;
+  cursor: grab;
+}
+.card:active { cursor: grabbing; }
+.card h4 { margin: 0; font-size: 1.06rem; }
+.format {
+  display: inline-block;
+  margin-bottom: 7px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #323343;
+  color: var(--stage);
+  font-size: .74rem;
+  font-weight: 700;
+}
+.notes { color: var(--muted); font-size: .9rem; white-space: pre-wrap; margin-top: 6px; }
+.card-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 13px; }
+.card-actions button, .card-actions select { font-size: .83rem; min-width: 0; padding: 7px 9px; }
+.card-actions select { max-width: 75%; }
+.empty {
+  color: var(--muted);
+  padding: 30px 14px;
+  font-size: .86rem;
+  border: 1px dashed #424452;
+  border-radius: 10px;
+  text-align: center;
+}
 footer { margin-top: 20px; }
-dialog { width: min(470px, calc(100% - 28px)); max-height: 90dvh; border: 1px solid var(--border); border-radius: 16px; padding: 22px; color: inherit; }
-dialog::backdrop { background: #23153488; }
-dialog h2 { font-size: 1.3rem; }
+dialog {
+  width: min(490px, calc(100% - 28px));
+  max-height: 90dvh;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: inherit;
+}
+dialog::backdrop { background: #080810bf; }
+dialog h2 { font-size: 1.35rem; }
 form { display: grid; gap: 13px; margin-top: 14px; }
 form label { display: grid; gap: 4px; min-width: 0; }
 .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 form input, form select, form textarea { width: 100%; min-width: 0; }
 textarea { resize: vertical; }
 .dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-.danger { color: #8a2445; margin-right: auto; }
-@media (max-width: 740px) {
-  main { padding-top: 16px; }
+.danger { color: #ffb1c1; margin-right: auto; }
+@media (max-width: 800px) {
+  main { width: min(620px, calc(100% - 32px)); }
   .board { grid-template-columns: 1fr; }
   .lane { min-height: 0; }
 }
-@media (max-width: 430px) {
-  header { align-items: flex-start; flex-direction: column; }
-  .toolbar input { min-width: 100%; }
+@media (max-width: 540px) {
+  .hero { align-items: stretch; flex-direction: column; gap: 20px; }
+  .overview { flex-basis: auto; min-width: 0; }
+  .toolbar { align-items: flex-start; }
+  .toolbar label { width: 100%; }
 }
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <div>
-      <h1>Clip Desk</h1>
-      <p>Plan, produce, and publish your videos.</p>
-    </div>
+  <div class="topbar">
+    <p class="brand"><span class="brand-icon" aria-hidden="true">▶</span> Clip Desk</p>
     <button class="primary" id="add" type="button">+ New idea</button>
+  </div>
+
+  <header class="hero">
+    <div>
+      <h1>Video production board</h1>
+      <p>Take each video from the first hook to publication.</p>
+    </div>
+    <div class="overview">
+      <label for="progress">Publishing progress</label>
+      <progress id="progress" value="0" max="1"></progress>
+      <p id="progress-label"></p>
+    </div>
   </header>
 
-  <div class="toolbar">
-    <input id="search" type="search" aria-label="Search videos" placeholder="Search titles, formats, and notes">
-    <p id="summary" role="status"></p>
-  </div>
-
-  <div class="board" aria-label="Video production board">
-    <section class="lane" data-stage="ideas" aria-labelledby="ideas-heading">
-      <div class="lane-head"><h2 id="ideas-heading">Ideas</h2><span class="count"></span></div>
-      <div class="cards"></div>
-    </section>
-    <section class="lane" data-stage="production" aria-labelledby="production-heading">
-      <div class="lane-head"><h2 id="production-heading">In production</h2><span class="count"></span></div>
-      <div class="cards"></div>
-    </section>
-    <section class="lane" data-stage="published" aria-labelledby="published-heading">
-      <div class="lane-head"><h2 id="published-heading">Published</h2><span class="count"></span></div>
-      <div class="cards"></div>
-    </section>
-  </div>
+  <section aria-labelledby="board-title">
+    <div class="toolbar">
+      <div><h2 id="board-title">Your pipeline</h2><p id="summary" role="status"></p></div>
+      <label><span aria-hidden="true">⌕</span><input id="search" type="search" aria-label="Search videos" placeholder="Search titles, formats, and notes"></label>
+    </div>
+    <div class="board">
+      <section class="lane" data-stage="ideas" aria-labelledby="ideas-heading">
+        <div class="lane-head">
+          <h3 id="ideas-heading">Ideas</h3><span class="count"></span>
+          <button class="lane-add" type="button" aria-label="Add video to Ideas">+</button>
+        </div>
+        <div class="cards"></div>
+      </section>
+      <section class="lane" data-stage="production" aria-labelledby="production-heading">
+        <div class="lane-head">
+          <h3 id="production-heading">In production</h3><span class="count"></span>
+          <button class="lane-add" type="button" aria-label="Add video to In production">+</button>
+        </div>
+        <div class="cards"></div>
+      </section>
+      <section class="lane" data-stage="published" aria-labelledby="published-heading">
+        <div class="lane-head">
+          <h3 id="published-heading">Published</h3><span class="count"></span>
+          <button class="lane-add" type="button" aria-label="Add video to Published">+</button>
+        </div>
+        <div class="cards"></div>
+      </section>
+    </div>
+  </section>
 
   <footer id="storage-status" role="status">Your board is saved in this browser.</footer>
 </main>
@@ -127,6 +291,13 @@ textarea { resize: vertical; }
 
 <script>
 const stages = {ideas: 'Ideas', production: 'In production', published: 'Published'};
+const emptyMessages = {
+  ideas: 'Add a rough idea or a hook you want to try.',
+  production: 'Move a card here when you start making it.',
+  published: 'Move finished videos here after they go live.'
+};
+const progress = document.querySelector('#progress');
+const progressLabel = document.querySelector('#progress-label');
 const storageKey = 'clip-desk.v1';
 const storageStatus = document.querySelector('#storage-status');
 const search = document.querySelector('#search');
@@ -140,6 +311,7 @@ const formatField = document.querySelector('#video-format');
 const stageField = document.querySelector('#video-stage');
 const notesField = document.querySelector('#video-notes');
 const remove = document.querySelector('#remove');
+let draggingId = null;
 let editingId = null;
 let trigger = add;
 let cards = [];
@@ -181,7 +353,15 @@ function addStages(select, current) {
 function renderCard(card) {
   const article = makeElement('article', '', 'card');
   article.dataset.id = card.id;
-  article.append(makeElement('p', card.format, 'format'), makeElement('h3', card.title));
+  article.draggable = true;
+  article.addEventListener('dragstart', event => {
+    if (event.target !== article) return;
+    draggingId = card.id;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', 'Clip Desk card');
+  });
+  article.addEventListener('dragend', clearDrag);
+  article.append(makeElement('p', card.format, 'format'), makeElement('h4', card.title));
   if (card.notes) article.append(makeElement('p', card.notes, 'notes'));
 
   const actions = makeElement('div', '', 'card-actions');
@@ -189,10 +369,7 @@ function renderCard(card) {
   move.setAttribute('aria-label', 'Stage for ' + card.title);
   addStages(move, card.stage);
   move.addEventListener('change', () => {
-    card.stage = move.value;
-    save();
-    render();
-    focusCard(card.id, 'select');
+    moveCard(card, move.value);
   });
 
   const edit = makeElement('button', 'Edit');
@@ -204,22 +381,38 @@ function renderCard(card) {
   return article;
 }
 
+function moveCard(card, stage) {
+  if (card.stage === stage) return;
+  card.stage = stage;
+  save();
+  render();
+  focusCard(card.id, 'select');
+}
+
+function clearDrag() {
+  draggingId = null;
+  for (const lane of lanes) lane.classList.remove('is-drop-target');
+}
+
 function render() {
   const query = search.value.trim().toLowerCase();
   const visible = cards.filter(card =>
     [card.title, card.format, card.notes].some(value => value.toLowerCase().includes(query))
   );
   const published = cards.filter(card => card.stage === 'published').length;
+  progress.max = Math.max(cards.length, 1);
+  progress.value = published;
+  progressLabel.textContent = published + ' of ' + cards.length + ' published';
   summary.textContent = query
     ? visible.length + ' of ' + cards.length + ' videos match'
-    : cards.length + (cards.length === 1 ? ' video' : ' videos') + ' · ' + published + ' published';
+    : cards.length + (cards.length === 1 ? ' video' : ' videos');
 
   for (const lane of lanes) {
     const stage = lane.dataset.stage;
     const items = visible.filter(card => card.stage === stage);
     lane.querySelector('.count').textContent = items.length;
     const container = lane.querySelector('.cards');
-    const empty = query ? 'No matches here' : 'No videos here yet';
+    const empty = query ? 'No matches in this stage.' : emptyMessages[stage];
     container.replaceChildren(...(items.length ? items.map(renderCard) : [makeElement('p', empty, 'empty')]));
   }
 }
@@ -229,14 +422,14 @@ function focusCard(id, control) {
   (card?.querySelector(control) ?? add).focus();
 }
 
-function openEditor(card, button) {
+function openEditor(card, button, stage = 'ideas') {
   editingId = card?.id ?? null;
   trigger = button;
-  document.querySelector('#editor-title').textContent = card ? 'Edit video' : 'New idea';
+  document.querySelector('#editor-title').textContent = card ? 'Edit video' : stage === 'ideas' ? 'New idea' : 'New video';
   titleField.value = card?.title ?? '';
   titleField.setCustomValidity('');
   formatField.value = card?.format ?? 'YouTube Short';
-  stageField.value = card?.stage ?? 'ideas';
+  stageField.value = card?.stage ?? stage;
   notesField.value = card?.notes ?? '';
   remove.hidden = !card;
   editor.showModal();
@@ -245,6 +438,27 @@ function openEditor(card, button) {
 
 addStages(stageField, 'ideas');
 add.addEventListener('click', () => openEditor(null, add));
+for (const lane of lanes) {
+  const stage = lane.dataset.stage;
+  const quickAdd = lane.querySelector('.lane-add');
+  quickAdd.addEventListener('click', () => openEditor(null, quickAdd, stage));
+  lane.addEventListener('dragover', event => {
+    if (!draggingId) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    lane.classList.add('is-drop-target');
+  });
+  lane.addEventListener('dragleave', event => {
+    if (!lane.contains(event.relatedTarget)) lane.classList.remove('is-drop-target');
+  });
+  lane.addEventListener('drop', event => {
+    if (!draggingId) return;
+    event.preventDefault();
+    const card = cards.find(item => item.id === draggingId);
+    clearDrag();
+    if (card) moveCard(card, stage);
+  });
+}
 search.addEventListener('input', render);
 titleField.addEventListener('input', () => titleField.setCustomValidity(''));
 document.querySelector('#cancel').addEventListener('click', () => editor.close());
